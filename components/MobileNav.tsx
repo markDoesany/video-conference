@@ -21,7 +21,7 @@ const MobileNav = () => {
         <SheetTrigger asChild>
           <Image src='/icons/hamburger.svg' height={32} width={32} alt='menu' className='cursor-pointer'/>
         </SheetTrigger>
-        <SheetContent side="left" className='bg-dark-1 border-none'>
+        <SheetContent side="left" className='bg-dark-1 border-none text-white'>
           <Link
           href="/"
           className='flex items-center gap-1'>

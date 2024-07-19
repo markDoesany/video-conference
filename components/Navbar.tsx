@@ -12,10 +12,10 @@ const Navbar = () => {
         className='flex items-center gap-1'>
         <Image
           src="/icons/logo.svg"
-          width={32}
-          height={32}
+          width={70}
+          height={70}
           alt='Goom logo'
-          className='max-sm:size-10'
+          className='max-sm:size-30'
         />
         <p className='text-[26px] font-extrabold text-white max-sm:hidden'>Goom</p>
       </Link>
