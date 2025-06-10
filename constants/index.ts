@@ -24,12 +24,9 @@ export const sideBarLinks = [
     route: '/personal-room',
     imgUrl: "/icons/add-personal.svg"
   },
-]
-
-export const avatarImages = [
-  '/images/avatar-1.jpeg',
-  '/images/avatar-2.jpeg',
-  '/images/avatar-3.png',
-  '/images/avatar-4.png',
-  '/images/avatar-5.png',
+  {
+    label: "Date & Time",
+    route: '/datetime',
+    imgUrl: "/icons/schedule.svg"
+  },
 ]

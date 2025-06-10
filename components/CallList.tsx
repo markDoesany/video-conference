@@ -41,6 +41,7 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
   };
 
   useEffect(() => {
+    let isMounted = true;
     const fetchRecordings = async () => {
       const callData = await Promise.all(
         callRecordings?.map((meeting) => meeting.queryRecordings()) ?? [],
@@ -50,12 +51,18 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
         .filter((call) => call.recordings.length > 0)
         .flatMap((call) => call.recordings);
 
-      setRecordings(recordings);
+      if (isMounted) {
+        setRecordings(recordings);
+      }
     };
 
     if (type === 'recordings') {
       fetchRecordings();
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [type, callRecordings]);
 
   if (isLoading) return <Loader />;
@@ -68,7 +75,8 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
       {calls && calls.length > 0 ? (
         calls.map((meeting: Call | CallRecording) => (
           <MeetingCard
-            key={(meeting as Call).id}
+            key={(meeting as Call).id || (meeting as CallRecording).filename}
+            call={type !== 'recordings' ? (meeting as Call) : undefined}
             icon={
               type === 'ended'
                 ? '/icons/previous.svg'
