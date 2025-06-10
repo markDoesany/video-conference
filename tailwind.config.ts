@@ -42,6 +42,10 @@ const config = {
         yellow: {
           1: '#F9A90E',
         },
+        primary: '#45A1BA',
+        'primary-foreground': '#FFFFFF', // Added primary-foreground
+        accent: '#FF5A5F',
+        'accent-foreground': '#FFFFFF',  // Added accent-foreground
       },
       keyframes: {
         'accordion-down': {

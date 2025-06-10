@@ -24,4 +24,9 @@ export const sideBarLinks = [
     route: '/personal-room',
     imgUrl: "/icons/add-personal.svg"
   },
+  {
+    label: "Date & Time",
+    route: '/datetime',
+    imgUrl: "/icons/schedule.svg"
+  },
 ]
