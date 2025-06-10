@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { useUser } from "@clerk/nextjs";
+import { Call } from "@stream-io/video-react-sdk";
 
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { avatarImages } from "@/constants";
 import { useToast } from "./ui/use-toast";
 
 interface MeetingCardProps {
@@ -16,6 +17,7 @@ interface MeetingCardProps {
   buttonText?: string;
   handleClick: () => void;
   link: string;
+  call?: Call; // Add call object to props
 }
 
 const MeetingCard = ({
@@ -27,8 +29,15 @@ const MeetingCard = ({
   handleClick,
   link,
   buttonText,
+  call, // Destructure call from props
 }: MeetingCardProps) => {
   const { toast } = useToast();
+  const { user } = useUser();
+
+  const participants =
+    call?.state.members.filter(
+      (member) => member.user.id !== user?.id
+    ) || [];
 
   return (
     <section className="flex min-h-[258px] w-full flex-col justify-between rounded-[14px] bg-dark-1 px-5 py-8 xl:max-w-[568px]">
@@ -43,20 +52,22 @@ const MeetingCard = ({
       </article>
       <article className={cn("flex justify-center relative", {})}>
         <div className="relative flex w-full max-md:hidden">
-          {avatarImages.map((img, index) => (
+          {participants.slice(0, 5).map((member, index) => (
             <Image
               key={index}
-              src={img}
-              alt="attendees"
+              src={member.user.image || "/images/default-avatar.png"} // Use default if image not available
+              alt={member.user.name || "participant"}
               width={40}
               height={40}
               className={cn("rounded-full", { absolute: index > 0 })}
               style={{ top: 0, left: index * 28 }}
             />
           ))}
-          <div className="flex-center absolute left-[136px] size-10 rounded-full border-[5px] border-dark-3 bg-dark-4">
-            +5
-          </div>
+          {participants.length > 5 && (
+            <div className="flex-center absolute left-[136px] size-10 rounded-full border-[5px] border-dark-3 bg-dark-4">
+              +{participants.length - 5}
+            </div>
+          )}
         </div>
         {!isPreviousMeeting && (
           <div className="flex gap-2">
