@@ -1,7 +1,7 @@
 import DateTime from '@/components/DateTime'; // Changed import
 import React from 'react';
 
-const DateTime = () => {
+const DateTimePage = () => { // Renamed component
   return (
     <section className="flex size-full flex-col items-center justify-center gap-10 text-white p-8"> {/* Added centering and padding */}
       <h1 className="text-3xl font-bold self-start">Date & Time</h1> {/* Keep title, but align self-start if page is centered */}
@@ -12,4 +12,4 @@ const DateTime = () => {
   );
 };
 
-export default DateTime;
+export default DateTimePage; // Updated export
