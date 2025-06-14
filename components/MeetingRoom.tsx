@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { CallControls, CallingState, CallParticipantsList, CallStatsButton, PaginatedGridLayout, SpeakerLayout, useCallStateHooks } from '@stream-io/video-react-sdk';
+import { CallControls, CallingState, CallParticipantsList, PaginatedGridLayout, SpeakerLayout, useCallStateHooks } from '@stream-io/video-react-sdk';
 import React, { useState } from 'react'
 import {
   DropdownMenu,
@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LayoutGrid, Users, LayoutList } from 'lucide-react';
+import { LayoutGrid, Users, LayoutList, BarChart2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import EndCallButton from './EndCallButton';
 import Loader from './Loader';
@@ -61,40 +61,38 @@ const MeetingRoom = () => {
             onLeave={() => router.push('/')}
           />
           
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-dark-3 transition-colors hover:bg-dark-4 flex-shrink-0">
-              <LayoutGrid size={16} className="text-white sm:size-5"/>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className='border-dark-3 bg-dark-2 text-white'>
-              {[
-                { value: 'grid', label: 'Grid', icon: <LayoutGrid size={16} className="mr-2" /> },
-                { value: 'speaker-left', label: 'Speaker Left', icon: <LayoutList size={16} className="mr-2" /> },
-                { value: 'speaker-right', label: 'Speaker Right', icon: <LayoutList size={16} className="mr-2" /> },
-              ].map((item) => (
-                <div key={item.value}>
-                  <DropdownMenuItem
-                    className='cursor-pointer hover:bg-dark-3 focus:bg-dark-3'
-                    onClick={() => setLayout(item.value as CallLayoutType)}
-                  >
-                    {item.icon}
-                    {item.label}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator className="border-dark-3"/>
-                </div>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <button 
-            onClick={() => setShowParticipants((prev) => !prev)}
-            className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full transition-colors flex-shrink-0 ${
-              showParticipants ? 'bg-blue-1' : 'bg-dark-3 hover:bg-dark-4'
-            }`}
-          >
-            <Users size={16} className='text-white sm:size-5'/>
-          </button>
-
-          <CallStatsButton/>
+          <div className='hidden ml-3 sm:block'>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-dark-3 transition-colors hover:bg-dark-4 flex-shrink-0">
+                <LayoutGrid size={16} className="text-white sm:size-5"/>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className='border-dark-3 bg-dark-2 text-white min-w-[200px]'>
+                {[
+                  { value: 'grid', label: 'Grid View', icon: <LayoutGrid size={16} className="mr-2" /> },
+                  { value: 'speaker-left', label: 'Speaker Left', icon: <LayoutList size={16} className="mr-2" /> },
+                  { value: 'speaker-right', label: 'Speaker Right', icon: <LayoutList size={16} className="mr-2" /> },
+                ].map((item) => (
+                  <div key={`view-${item.value}`}>
+                    <DropdownMenuItem
+                      className='cursor-pointer hover:bg-dark-3 focus:bg-dark-3'
+                      onClick={() => setLayout(item.value as CallLayoutType)}
+                    >
+                      {item.icon}
+                      {item.label}
+                    </DropdownMenuItem>
+                  </div>
+                ))}
+                
+                <DropdownMenuItem 
+                  className='cursor-pointer hover:bg-dark-3 focus:bg-dark-3'
+                  onClick={() => setShowParticipants(!showParticipants)}
+                >
+                  <Users size={16} className="mr-2" />
+                  {showParticipants ? 'Hide Participants' : 'Show Participants'}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           
           {!isPersonalRoom && <EndCallButton/>}
         </div>

@@ -101,7 +101,7 @@ const MeetingTypeList = () => {
         handleClick={handleInstantMeeting}
         bgColor="bg-orange-1"
         iconBg="bg-orange-1/10"
-        bgIcon="/icons/video.svg"
+        bgIcon="/icons/Video.svg"
       />
       <HomeCard
         img="/icons/schedule.svg"
