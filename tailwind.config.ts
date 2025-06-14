@@ -88,6 +88,10 @@ const config = {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        primary: '#45A1BA',
+        'primary-foreground': '#FFFFFF', // Added primary-foreground
+        accent: '#FF5A5F',
+        'accent-foreground': '#FFFFFF',  // Added accent-foreground
       },
       keyframes: {
         'accordion-down': {

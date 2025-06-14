@@ -109,7 +109,7 @@
 }
 
 .str-video__participant-list {
-  background-color: #1c1f2e;
+  @apply bg-dark-1; /* Replaced #1c1f2e */
   padding: 10px;
   border-radius: 10px;
   color: white;
@@ -144,7 +144,7 @@
   height: 40px;
 }
 .cl-dividerLine {
-  background: #252a41;
+  @apply bg-dark-3; /* Replaced #252a41 */
   height: 2px;
 }
 

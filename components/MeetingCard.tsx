@@ -18,6 +18,7 @@ interface MeetingCardProps {
   buttonText?: string;
   handleClick: () => void;
   link: string;
+  call?: Call;
 }
 
 const MeetingCard = ({
@@ -29,88 +30,93 @@ const MeetingCard = ({
   handleClick,
   link,
   buttonText,
+  call,
 }: MeetingCardProps) => {
   const { user } = useUser();
   const router = useRouter();
   const client = useStreamVideoClient();
   const { toast } = useToast();
   const [callDetails, setCallDetails] = useState<Call>();
-  const { calls, loading } = useGetCalls();
 
-  // Get meeting link
-  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`;
-
-  // Get participants
-  const participants = callDetails?.state?.participants || [];
-
+  // Get participants - handle case when call is not provided
+  const participants = call?.state?.participants || callDetails?.state?.participants || [];
   return (
     <div className="bg-dark-1 rounded-lg p-6 flex flex-col gap-6">
       <div className="flex items-center gap-4">
         <div className="p-2 bg-dark-2 rounded-lg">
           <img src={icon} alt="icon" width={24} height={24} />
         </div>
-        <h2 className="text-xl font-semibold">{title}</h2>
+        <h2 className="text-xl font-semibold">{title || 'Untitled Meeting'}</h2>
       </div>
 
       <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-300">{date}</p>
-        <div className="flex -space-x-2">
-          {participants.length > 0 ? (
-            participants.slice(0, 5).map((participant) => (
-              <Avatar key={participant.sessionId} className="h-8 w-8 border-2 border-dark-1">
-                <AvatarImage 
-                  src={participant.user?.image} 
-                  alt={participant.user?.name || 'Participant'} 
-                />
+        <div className="flex flex-col gap-1">
+          <p className="text-sm text-gray-300">{date}</p>
+          {call?.state?.startsAt && (
+            <p className="text-xs text-gray-400">
+              {new Date(call.state.startsAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+              {call.state.endedAt && (
+                <span> - {new Date(call.state.endedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+              )}
+            </p>
+          )}
+        </div>
+        {(isPreviousMeeting || !call?.state?.startsAt) && (
+          <div className="flex -space-x-2">
+            {participants?.length > 0 ? (
+              participants
+                .filter(p => p && p.source)
+                .slice(0, 5)
+                .map((participant, index) => (
+                  <Avatar 
+                    key={participant.sessionId || `participant-${index}`} 
+                    className="h-8 w-8 border-2 border-dark-1"
+                  >
+                    <AvatarFallback className="bg-dark-3 text-white">
+                      {String.fromCharCode(65 + index)}
+                    </AvatarFallback>
+                  </Avatar>
+                ))
+            ) : (
+              <Avatar className="h-8 w-8 border-2 border-dark-1">
                 <AvatarFallback className="bg-dark-3 text-white">
-                  {participant.user?.name?.charAt(0) || 'U'}
+                  {user?.firstName?.charAt(0) || 'U'}
                 </AvatarFallback>
               </Avatar>
-            ))
-          ) : (
-            <Avatar className="h-8 w-8 border-2 border-dark-1">
-              <AvatarImage 
-                src={user?.imageUrl} 
-                alt={user?.fullName || 'You'} 
-              />
-              <AvatarFallback className="bg-dark-3 text-white">
-                {user?.fullName?.charAt(0) || 'U'}
-              </AvatarFallback>
-            </Avatar>
-          )}
-          {participants.length > 5 && (
-            <div className="h-8 w-8 rounded-full bg-dark-3 flex items-center justify-center text-xs">
-              +{participants.length - 5}
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {!isPreviousMeeting && (
-        <div className="flex gap-2">
-          <Button onClick={handleClick} className="bg-blue-1 hover:bg-blue-1/80">
+      <div className="flex flex-col gap-4">
+        {!isPreviousMeeting && (
+          <Button
+            onClick={handleClick}
+            className="bg-blue-1 hover:bg-blue-600 text-white rounded-lg py-2 px-4 w-full"
+          >
             {buttonIcon1 && (
-              <img src={buttonIcon1} alt="feature" width={20} height={20} />
+              <img src={buttonIcon1} alt="feature" className="mr-2" />
             )}
-            &nbsp; {buttonText || 'Start'}
+            {buttonText || 'Start Meeting'}
           </Button>
+        )}
+        
+        {!isPreviousMeeting && link && (
           <Button
             onClick={() => {
-              navigator.clipboard.writeText(meetingLink);
-              toast({ title: 'Link copied' });
+              navigator.clipboard.writeText(link);
+              toast({
+                title: 'Link copied to clipboard',
+                duration: 2000,
+              });
             }}
-            className="bg-dark-4 px-6"
+            className="bg-dark-3 hover:bg-dark-4 text-white rounded-lg py-2 px-4 w-full"
           >
-            <img
-              src="/icons/copy.svg"
-              alt="feature"
-              width={20}
-              height={20}
-            />
-            &nbsp; Copy Link
+            <img src="/icons/copy.svg" alt="copy" width={20} height={20} className="mr-2" />
+            Copy Invitation
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

@@ -28,7 +28,11 @@ const MeetingTypeList = () => {
     if (!client || !user) return
 
     try {
-      if (!values.dateTime){
+      // For instant meetings, set the time to now
+      const isInstantMeeting = meetingState === 'isInstantMeeting';
+      const meetingTime = isInstantMeeting ? new Date() : values.dateTime;
+
+      if (!isInstantMeeting && !meetingTime) {
         toast({
           title: 'Please select a date and time',
           variant: "destructive",
@@ -43,14 +47,14 @@ const MeetingTypeList = () => {
         throw new Error("Failed to create call");
       }
 
-      const startsAt = values.dateTime.toISOString();
-      const description = values.description || "Scheduled meeting";
+      const startsAt = meetingTime.toISOString();
+      const description = values.description || (isInstantMeeting ? "Instant meeting" : "Scheduled meeting");
 
       await call.getOrCreate({
         data: {
           starts_at: startsAt,
           custom: {
-            description: values.title || 'Untitled Meeting',
+            description: isInstantMeeting ? 'Instant Meeting' : (values.title || 'Untitled Meeting'),
             ...(values.description && { details: values.description })
           }
         }
@@ -58,8 +62,13 @@ const MeetingTypeList = () => {
 
       toast({
         title: "Meeting Created",
-        description: `Meeting scheduled for ${values.dateTime.toLocaleString()}`,
+        description: isInstantMeeting 
+          ? "Instant meeting started" 
+          : `Meeting scheduled for ${meetingTime.toLocaleString()}`,
       });
+
+      // Update callDetails and meetingLink
+      setCallDetails(call);
 
       // Redirect to the meeting room
       router.push(`/meeting/${call.id}`);
@@ -67,12 +76,21 @@ const MeetingTypeList = () => {
       console.error(error);
       toast({
         title: "Failed to create meeting",
+        description: error instanceof Error ? error.message : "An error occurred",
         variant: "destructive",
       });
+    } finally {
+      setMeetingState(undefined);
     }
   };
 
-  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`;
+  const handleInstantMeeting = async () => {
+    setMeetingState('isInstantMeeting');
+    await createMeeting();
+  };
+
+  // Define meetingLink using callDetails
+  const meetingLink = callDetails ? `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails.id}` : '';
 
   return (
     <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -80,7 +98,7 @@ const MeetingTypeList = () => {
         img="/icons/add-meeting.svg"
         title="New Meeting"
         description="Start an instant meeting"
-        handleClick={() => setMeetingState('isInstantMeeting')}
+        handleClick={handleInstantMeeting}
         bgColor="bg-orange-1"
         iconBg="bg-orange-1/10"
         bgIcon="/icons/video.svg"
