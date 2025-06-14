@@ -59,7 +59,6 @@ const MeetingRoom = () => {
         <div className='flex items-center overflow-x-auto w-full justify-center py-2'>
           <CallControls 
             onLeave={() => router.push('/')}
-            className='flex-shrink-0'
           />
           
           <DropdownMenu>
@@ -95,9 +94,9 @@ const MeetingRoom = () => {
             <Users size={16} className='text-white sm:size-5'/>
           </button>
 
-          <CallStatsButton className="flex-shrink-0"/>
+          <CallStatsButton/>
           
-          {!isPersonalRoom && <EndCallButton className="flex-shrink-0"/>}
+          {!isPersonalRoom && <EndCallButton/>}
         </div>
       </div>
 
