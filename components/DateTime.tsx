@@ -36,10 +36,10 @@ const DateTime: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <h1 className="text-4xl font-extrabold lg:text-7xl">
+      <h1 className="text-4xl font-extrabold lg:text-7xl text-gray-900 max-md:text-white">
         {time}
       </h1>
-      <p className="text-lg font-medium text-sky-1 lg:text-2xl">
+      <p className="text-lg font-medium text-gray-900 max-md:text-white lg:text-2xl">
         {date}
       </p>
     </div>

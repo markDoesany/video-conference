@@ -1,11 +1,13 @@
 "use client";
 
-import Image from "next/image";
-
-import { cn } from "@/lib/utils";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
+import { useGetCalls } from "@/hooks/useGetCalls";
+import { useState, useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
 import { Button } from "./ui/button";
-import { avatarImages } from "@/constants";
-import { useToast } from "./ui/use-toast";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 
 interface MeetingCardProps {
   title: string;
@@ -19,74 +21,97 @@ interface MeetingCardProps {
 }
 
 const MeetingCard = ({
-  icon,
   title,
   date,
+  icon,
   isPreviousMeeting,
   buttonIcon1,
   handleClick,
   link,
   buttonText,
 }: MeetingCardProps) => {
+  const { user } = useUser();
+  const router = useRouter();
+  const client = useStreamVideoClient();
   const { toast } = useToast();
+  const [callDetails, setCallDetails] = useState<Call>();
+  const { calls, loading } = useGetCalls();
+
+  // Get meeting link
+  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`;
+
+  // Get participants
+  const participants = callDetails?.state?.participants || [];
 
   return (
-    <section className="flex min-h-[258px] w-full flex-col justify-between rounded-[14px] bg-dark-1 px-5 py-8 xl:max-w-[568px]">
-      <article className="flex flex-col gap-5">
-        <Image src={icon} alt="upcoming" width={28} height={28} />
-        <div className="flex justify-between">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-2xl font-bold">{title}</h1>
-            <p className="text-base font-normal">{date}</p>
-          </div>
+    <div className="bg-dark-1 rounded-lg p-6 flex flex-col gap-6">
+      <div className="flex items-center gap-4">
+        <div className="p-2 bg-dark-2 rounded-lg">
+          <img src={icon} alt="icon" width={24} height={24} />
         </div>
-      </article>
-      <article className={cn("flex justify-center relative", {})}>
-        <div className="relative flex w-full max-md:hidden">
-          {avatarImages.map((img, index) => (
-            <Image
-              key={index}
-              src={img}
-              alt="attendees"
-              width={40}
-              height={40}
-              className={cn("rounded-full", { absolute: index > 0 })}
-              style={{ top: 0, left: index * 28 }}
-            />
-          ))}
-          <div className="flex-center absolute left-[136px] size-10 rounded-full border-[5px] border-dark-3 bg-dark-4">
-            +5
-          </div>
-        </div>
-        {!isPreviousMeeting && (
-          <div className="flex gap-2">
-            <Button onClick={handleClick} className="rounded bg-blue-1 px-6">
-              {buttonIcon1 && (
-                <Image src={buttonIcon1} alt="feature" width={20} height={20} />
-              )}
-              &nbsp; {buttonText}
-            </Button>
-            <Button
-              onClick={() => {
-                navigator.clipboard.writeText(link);
-                toast({
-                  title: "Link Copied",
-                });
-              }}
-              className="bg-dark-4 px-6"
-            >
-              <Image
-                src="/icons/copy.svg"
-                alt="feature"
-                width={20}
-                height={20}
+        <h2 className="text-xl font-semibold">{title}</h2>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-300">{date}</p>
+        <div className="flex -space-x-2">
+          {participants.length > 0 ? (
+            participants.slice(0, 5).map((participant) => (
+              <Avatar key={participant.sessionId} className="h-8 w-8 border-2 border-dark-1">
+                <AvatarImage 
+                  src={participant.user?.image} 
+                  alt={participant.user?.name || 'Participant'} 
+                />
+                <AvatarFallback className="bg-dark-3 text-white">
+                  {participant.user?.name?.charAt(0) || 'U'}
+                </AvatarFallback>
+              </Avatar>
+            ))
+          ) : (
+            <Avatar className="h-8 w-8 border-2 border-dark-1">
+              <AvatarImage 
+                src={user?.imageUrl} 
+                alt={user?.fullName || 'You'} 
               />
-              &nbsp; Copy Link
-            </Button>
-          </div>
-        )}
-      </article>
-    </section>
+              <AvatarFallback className="bg-dark-3 text-white">
+                {user?.fullName?.charAt(0) || 'U'}
+              </AvatarFallback>
+            </Avatar>
+          )}
+          {participants.length > 5 && (
+            <div className="h-8 w-8 rounded-full bg-dark-3 flex items-center justify-center text-xs">
+              +{participants.length - 5}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {!isPreviousMeeting && (
+        <div className="flex gap-2">
+          <Button onClick={handleClick} className="bg-blue-1 hover:bg-blue-1/80">
+            {buttonIcon1 && (
+              <img src={buttonIcon1} alt="feature" width={20} height={20} />
+            )}
+            &nbsp; {buttonText || 'Start'}
+          </Button>
+          <Button
+            onClick={() => {
+              navigator.clipboard.writeText(meetingLink);
+              toast({ title: 'Link copied' });
+            }}
+            className="bg-dark-4 px-6"
+          >
+            <img
+              src="/icons/copy.svg"
+              alt="feature"
+              width={20}
+              height={20}
+            />
+            &nbsp; Copy Link
+          </Button>
+        </div>
+      )}
+    </div>
   );
 };
 

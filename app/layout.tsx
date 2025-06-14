@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: "Goom",
   description: "Video calling application for noobs",
   icons: {
-    icon: '/icons/logo.svg',
+    icon: '/icons/goom.png',
   }
 };
 
@@ -26,7 +26,7 @@ export default function RootLayout({
       <ClerkProvider
         appearance={{
           layout:{
-            logoImageUrl:'/icons/yoom-logo.svg',
+            logoImageUrl:'/icons/goom.png',
             socialButtonsVariant: 'iconButton'
           },
           variables:{

@@ -26,7 +26,7 @@ const MobileNav = () => {
           href="/"
           className='flex items-center gap-1'>
           <Image
-            src="/icons/logo.svg"
+            src="/icons/goom.png"
             width={32}
             height={32}
             alt='Goom logo'
