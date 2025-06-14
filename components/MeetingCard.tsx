@@ -65,7 +65,6 @@ const MeetingCard = ({
           <div className="flex -space-x-2">
             {participants?.length > 0 ? (
               participants
-                .filter(p => p && p.source)
                 .slice(0, 5)
                 .map((participant, index) => (
                   <Avatar 
